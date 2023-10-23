@@ -1,0 +1,49 @@
+﻿@using DataSourceSharedLibrary.Models
+@using DataSourceSharedLibrary.Services
+@using Microsoft.AspNetCore.Components.Forms
+
+@if (ShowAddProduct)
+{
+    <div class="card">
+        <div class="card-header">Add Product</div>
+        <div class="card-body">
+            <EditForm Model="ProductModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <ValidationSummary></ValidationSummary>
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <InputText class="form-control" @bind-Value="ProductModel.Name"></InputText>
+                    <ValidationMessage For="()=>ProductModel.Name"></ValidationMessage>
+                </div>
+                <div class="form-group mt-2">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" @bind-Value="ProductModel.Description"></InputTextArea>
+                    <ValidationMessage For="()=>ProductModel.Description"></ValidationMessage>
+                </div>
+                <div class="form-group mt-2">
+                    <label class="form-label">Quantity</label>
+                    <InputNumber class="form-control" @bind-Value="ProductModel.Quantity"></InputNumber>
+                    <ValidationMessage For="()=>ProductModel.Quantity"></ValidationMessage>
+                </div>
+                <div class="mt-2">
+                    <button class="btn btn-primary">Add Product</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    private Product ProductModel { get; set; } = new();
+    [Parameter] public bool ShowAddProduct { get; set; }
+    [Parameter] public EventCallback<Product> HandleSubmitProductEventCallBack { get; set; }
+
+    private async void HandleSubmit()
+    {
+        await HandleSubmitProductEventCallBack.InvokeAsync(ProductModel);
+        ProductModel = new Product();
+    }
+
+
+}
+

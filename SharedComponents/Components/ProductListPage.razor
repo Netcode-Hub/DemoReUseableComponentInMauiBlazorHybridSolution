@@ -1,0 +1,74 @@
+﻿@using DataSourceSharedLibrary.Models
+
+@if (ShowProductList)
+{
+
+    <div class="card">
+        <div class="card-header">
+            <button class="btn btn-link float-end text-decoration-none" @onclick="HandleAddProduct">
+                <i class="oi oi-plus"></i>
+                Add Product
+            </button>
+        </div>
+        @if (Products.Count > 0)
+        {
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var product in Products)
+                        {
+                            <tr>
+                                <td>@product.Id</td>
+                                <td>@product.Name</td>
+                                <td>@product.Description</td>
+                                <td>@product.Quantity</td>
+                                <td>
+                                    <i class="oi oi-pencil text-info" @onclick="(async ()=> await HandleEdit(product))"></i> &nbsp;
+                                    <i class="oi oi-trash text-danger" @onclick="(async ()=> await HandleDelete(product.Id))"></i>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">Sorry, Nothing in your product table, please add something...🤷‍♂️</div>
+        }
+    </div>
+
+}
+@code
+{
+    [Parameter] public bool ShowProductList { get; set; }
+    [Parameter] public List<Product> Products { get; set; } = new();
+    [Parameter] public EventCallback<Product> HandleEditProductEventCallBack { get; set; }
+    [Parameter] public EventCallback<int> HandleDeleteProductEventCallBack { get; set; }
+    [Parameter] public EventCallback HandleAddProductBtnEventCallBack { get; set; }
+
+    private async Task HandleEdit(Product model)
+    {
+        await HandleEditProductEventCallBack.InvokeAsync(model);
+    }
+
+    private async Task HandleDelete(int id)
+    {
+        await HandleDeleteProductEventCallBack.InvokeAsync(id);
+    }
+
+    private async Task HandleAddProduct()
+    {
+        await HandleAddProductBtnEventCallBack.InvokeAsync();
+    }
+}

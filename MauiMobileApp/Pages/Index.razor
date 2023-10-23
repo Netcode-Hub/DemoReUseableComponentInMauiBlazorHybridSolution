@@ -1,0 +1,105 @@
+﻿@page "/"
+@using DataSourceSharedLibrary.Models
+@using DataSourceSharedLibrary.Services
+@using SharedComponents.Components
+
+<div style="width:@((DeviceDisplay.Current.MainDisplayInfo.Width)/(DeviceDisplay.Current.MainDisplayInfo.Density))px; position:absolute;left:0;right:0">
+
+    <ProductListPage Products="ProductService.Products"
+                     ShowProductList="ShowProductList"
+                     HandleAddProductBtnEventCallBack="AddProduct"
+                     HandleEditProductEventCallBack="EditProduct"
+                     HandleDeleteProductEventCallBack="DeleteProduct">
+    </ProductListPage>
+
+
+    <AddProductPage ShowAddProduct="ShowAddProduct"
+                    HandleSubmitProductEventCallBack="SaveProduct">
+    </AddProductPage>
+
+    <UpdateProductPage ProductModel="ProductModel"
+                       ShowEditProduct="ShowEditProduct"
+                       HandleSubmitProductEventCallBack="UpdateProduct">
+
+    </UpdateProductPage>
+
+</div>
+@code
+{
+    public Product ProductModel { get; set; } = new();
+    public bool ShowProductList { get; set; }
+    public bool ShowAddProduct { get; set; }
+    public bool ShowEditProduct { get; set; }
+
+    protected override void OnInitialized()
+    {
+        RestViews();
+        ShowProductList = true;
+    }
+
+
+    // Add Product
+    private void AddProduct()
+    {
+        RestViews();
+        ShowAddProduct = true;
+    }
+
+    private void SaveProduct(Product model)
+    {
+        int GenerateId = 0;
+        var getlastAddedProduct = ProductService.Products.LastOrDefault();
+        if (getlastAddedProduct is null)
+            GenerateId++;
+        else
+            GenerateId = getlastAddedProduct.Id + 1;
+
+        model.Id = GenerateId;
+        ProductService.AddProduct(model);
+        RestViews();
+        ShowProductList = true;
+    }
+
+
+    //Edit Product
+    private void EditProduct(Product model)
+    {
+        ProductModel = new Product();
+        ProductModel = model;
+        RestViews();
+        ShowEditProduct = true;
+
+    }
+
+    private void UpdateProduct(Product model)
+    {
+        ProductService.UpdateProduct(model);
+        RestViews();
+        ShowProductList = true;
+    }
+
+
+    //Delete Product
+    private async void DeleteProduct(int id)
+    {
+        bool confirm = await App.Current.MainPage.DisplayAlert("Confirm Delete", "Are you sure?", "Yes", "No");
+        if (confirm)
+        {
+            ProductService.DeleteProduct(id);
+            RestViews();
+            ShowProductList = true;
+            StateHasChanged();
+        }
+
+    }
+
+
+
+    //General Method
+    private void RestViews()
+    {
+        ShowProductList = false;
+        ShowAddProduct = false;
+        ShowEditProduct = false;
+    }
+}
